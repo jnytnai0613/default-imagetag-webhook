@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-imagetag-webhook
+  labels:
+    app: default-imagetag-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: default-imagetag-webhook
+  template:
+    metadata:
+      labels:
+        app: default-imagetag-webhook
+    spec:
+      containers:
+        - name: default-imagetag-webhook
+          image: default-imagetag-webhook:latest
+          imagePullPolicy: Never
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            defaultMode: 420
+            secretName: default-imagetag-webhook-cert
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-imagetag-webhook
+  labels:
+    app: default-imagetag-webhook
+spec:
+  ports:
+  - port: 443
+    targetPort: 8080
+  selector:
+    app: default-imagetag-webhook

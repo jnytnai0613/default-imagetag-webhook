@@ -1,0 +1,24 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: default-imagetag-webhook
+  labels:
+    app: default-imagetag-webhook
+    kind: mutator
+  annotations:
+    cert-manager.io/inject-ca-from: default/serving-cert
+webhooks:
+- admissionReviewVersions:
+  - v1
+  name: default-imagetag-webhook.slok.dev
+  clientConfig:
+    service:
+      name: default-imagetag-webhook
+      namespace: default
+      path: "/mutate"
+  rules:
+  - operations: [ "CREATE" ]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+  sideEffects: None        
